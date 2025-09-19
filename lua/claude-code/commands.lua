@@ -1,10 +1,11 @@
 ---@mod claude-code.commands Command registration for claude-code.nvim
 ---@brief [[
 --- This module provides command registration and handling for claude-code.nvim.
---- It defines user commands and command handlers.
+--- It defines user commands and command handlers, including AI-enhanced features.
 ---@brief ]]
 
 local M = {}
+local ai_commands = require('claude-code.ai_commands')
 
 --- @type table<string, function> List of available commands and their handlers
 M.commands = {}
@@ -34,6 +35,9 @@ function M.register_commands(claude_code)
   vim.api.nvim_create_user_command('ClaudeCodeVersion', function()
     vim.notify('Claude Code version: ' .. claude_code.version(), vim.log.levels.INFO)
   end, { desc = 'Display Claude Code version' })
+
+  -- Register AI-enhanced commands
+  ai_commands.register_ai_commands(claude_code)
 end
 
 return M
