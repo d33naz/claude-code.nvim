@@ -19,6 +19,7 @@
 -- Import modules
 local config = require('claude-code.config')
 local commands = require('claude-code.commands')
+local instance_commands = require('claude-code.instance_commands')
 local keymaps = require('claude-code.keymaps')
 local file_refresh = require('claude-code.file_refresh')
 local terminal = require('claude-code.terminal')
@@ -118,6 +119,9 @@ function M.setup(user_config)
 
   -- Register commands
   commands.register_commands(M)
+
+  -- Register instance management commands
+  instance_commands.register_commands(M)
 
   -- Register keymaps
   keymaps.register_keymaps(M, M.config)

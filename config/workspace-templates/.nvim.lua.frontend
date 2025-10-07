@@ -1,0 +1,25 @@
+-- Frontend Developer Workspace Configuration
+-- Copy this file to your project root as .nvim.lua or add to init.lua
+
+-- Load the frontend profile
+local frontend_profile = require('claude-code.config.team-profiles.frontend')
+
+-- You can override specific settings per project here
+frontend_profile.command_variants.Component = '--context component --typescript --jsx'
+frontend_profile.command_variants.Style = '--context css --tailwind'
+
+-- Customize refresh settings for your build tool
+frontend_profile.refresh.timer_interval = 300  -- 300ms for Vite HMR
+frontend_profile.refresh.show_notifications = false  -- Reduce noise
+
+-- Setup with the customized profile
+require('claude-code').setup(frontend_profile)
+
+-- Optional: Project-specific autocommands
+vim.api.nvim_create_autocmd('BufWritePost', {
+  pattern = '*.{tsx,jsx,css,scss}',
+  callback = function()
+    -- Auto-refresh browser or run tests
+    -- vim.fn.system('pnpm test:changed')
+  end,
+})

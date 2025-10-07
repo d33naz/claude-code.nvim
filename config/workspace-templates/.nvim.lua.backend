@@ -1,0 +1,20 @@
+-- Backend Developer Workspace Configuration
+-- Copy this file to your project root as .nvim.lua or add to init.lua
+
+-- Load the backend profile
+local backend_profile = require('claude-code.config.team-profiles.backend')
+
+-- You can override specific settings per project here
+backend_profile.command_variants.API = '--context api --openapi-spec docs/api.yaml'
+backend_profile.command_variants.Database = '--context database --schema db/schema.sql'
+
+-- Setup with the customized profile
+require('claude-code').setup(backend_profile)
+
+-- Optional: Project-specific autocommands
+vim.api.nvim_create_autocmd('BufWritePost', {
+  pattern = '*.sql',
+  callback = function()
+    vim.notify('SQL file saved - consider running migrations', vim.log.levels.INFO)
+  end,
+})

@@ -1,0 +1,28 @@
+-- DevOps/SRE Workspace Configuration
+-- Copy this file to your project root as .nvim.lua or add to init.lua
+
+-- Load the devops profile
+local devops_profile = require('claude-code.config.team-profiles.devops')
+
+-- You can override specific settings per project here
+devops_profile.command_variants.Infra = '--context infrastructure --terraform --aws'
+devops_profile.command_variants.K8s = '--context kubernetes --namespace production'
+devops_profile.command_variants.Deploy = '--deploy --dry-run --cluster staging'
+
+-- Setup with the customized profile
+require('claude-code').setup(devops_profile)
+
+-- Optional: Project-specific autocommands
+vim.api.nvim_create_autocmd('BufWritePost', {
+  pattern = '*.{tf,yaml,yml}',
+  callback = function()
+    vim.notify('Infrastructure file changed - run plan before apply', vim.log.levels.WARN)
+  end,
+})
+
+-- Optional: Kubectl context switcher
+vim.api.nvim_create_user_command('K8sContext', function(opts)
+  local context = opts.args
+  vim.fn.system('kubectl config use-context ' .. context)
+  vim.notify('Switched to context: ' .. context, vim.log.levels.INFO)
+end, { nargs = 1 })

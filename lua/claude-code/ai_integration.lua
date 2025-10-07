@@ -12,11 +12,34 @@ M.base_url = 'http://localhost:8004'
 
 --- @type table Configuration for AI integration
 M.config = {
+  enabled = true,
   auto_health_check = true,
   health_check_interval = 30000, -- 30 seconds
   max_retries = 3,
   timeout = 5000, -- 5 seconds
+  request_timeout = 30000, -- 30 seconds for AI requests
+  rate_limit = {
+    max_requests_per_minute = 30,
+    burst_size = 10,
+  },
+  privacy = {
+    send_file_paths = false,
+    redact_secrets = true,
+    max_code_size = 100000, -- 100KB limit
+  },
 }
+
+--- @type table Rate limiting state
+M._rate_limit_state = {
+  requests = {},
+  last_cleanup = os.time(),
+}
+
+--- @type boolean Health check status cache
+M._health_status = nil
+
+--- @type number Last health check time
+M._last_health_check = 0
 
 --- @type table Available AI engines and their capabilities
 M.engines = {
@@ -46,6 +69,84 @@ M.engines = {
     description = 'Performance guarantees',
   },
 }
+
+--- Check rate limit compliance
+--- @return boolean allowed
+--- @return string? reason
+local function check_rate_limit()
+  local now = os.time()
+  local state = M._rate_limit_state
+
+  -- Cleanup old requests (older than 1 minute)
+  if now - state.last_cleanup > 60 then
+    local cutoff = now - 60
+    local new_requests = {}
+    for _, timestamp in ipairs(state.requests) do
+      if timestamp > cutoff then
+        table.insert(new_requests, timestamp)
+      end
+    end
+    state.requests = new_requests
+    state.last_cleanup = now
+  end
+
+  -- Check if within rate limit
+  local count = #state.requests
+  if count >= M.config.rate_limit.max_requests_per_minute then
+    return false, 'Rate limit exceeded'
+  end
+
+  -- Add current request
+  table.insert(state.requests, now)
+  return true, nil
+end
+
+--- Redact sensitive information from code
+--- @param code string Code content
+--- @return string redacted_code
+local function redact_secrets(code)
+  if not M.config.privacy.redact_secrets then
+    return code
+  end
+
+  -- Patterns for common secrets
+  local patterns = {
+    { pattern = '(["\'])([A-Za-z0-9+/=]{32,})%1', replacement = '%1[REDACTED_SECRET]%1' },
+    { pattern = 'password%s*=%s*["\']([^"\']+)["\']', replacement = 'password="[REDACTED]"' },
+    { pattern = 'api[_-]?key%s*=%s*["\']([^"\']+)["\']', replacement = 'api_key="[REDACTED]"' },
+    { pattern = 'token%s*=%s*["\']([^"\']+)["\']', replacement = 'token="[REDACTED]"' },
+    { pattern = 'secret%s*=%s*["\']([^"\']+)["\']', replacement = 'secret="[REDACTED]"' },
+  }
+
+  local redacted = code
+  for _, rule in ipairs(patterns) do
+    redacted = redacted:gsub(rule.pattern, rule.replacement)
+  end
+
+  return redacted
+end
+
+--- Validate and sanitize code before sending
+--- @param code string Code content
+--- @return string? sanitized_code
+--- @return string? error
+local function sanitize_code(code)
+  if not code or code == '' then
+    return nil, 'Empty code content'
+  end
+
+  -- Check size limit
+  if #code > M.config.privacy.max_code_size then
+    return nil, string.format(
+      'Code size exceeds limit: %d bytes (max: %d)',
+      #code,
+      M.config.privacy.max_code_size
+    )
+  end
+
+  -- Redact secrets
+  return redact_secrets(code), nil
+end
 
 --- Check if NexaMind API is available
 --- @return boolean available
@@ -79,7 +180,12 @@ end
 --- @return table? response
 --- @return string? error
 function M.api_request(endpoint, data)
-  local json_data = vim.json.encode(data or {})
+  -- Try to encode data with error handling
+  local ok, json_data = pcall(vim.json.encode, data or {})
+  if not ok then
+    return nil, 'Failed to encode request data: ' .. tostring(json_data)
+  end
+
   local curl_cmd = string.format(
     'curl -s -X POST -H "Content-Type: application/json" -d \'%s\' %s%s',
     json_data,
@@ -100,8 +206,8 @@ function M.api_request(endpoint, data)
   end
 
   -- Try to parse JSON response
-  local ok, parsed = pcall(vim.json.decode, result)
-  if ok then
+  local parse_ok, parsed = pcall(vim.json.decode, result)
+  if parse_ok then
     return parsed, nil
   else
     return nil, 'Invalid JSON response: ' .. tostring(parsed)
@@ -114,9 +220,25 @@ end
 --- @return table? analysis
 --- @return string? error
 function M.analyze_code_quality(code_content, file_type)
+  if not M.config.enabled then
+    return nil, 'AI integration is disabled'
+  end
+
   local available, err = M.check_health()
   if not available then
     return nil, 'NexaMind API unavailable: ' .. (err or 'unknown error')
+  end
+
+  -- Check rate limit
+  local allowed, rate_err = check_rate_limit()
+  if not allowed then
+    return nil, rate_err
+  end
+
+  -- Sanitize code
+  local sanitized, sanitize_err = sanitize_code(code_content)
+  if not sanitized then
+    return nil, sanitize_err
   end
 
   -- Use the chat endpoint for code analysis
@@ -132,7 +254,7 @@ function M.analyze_code_quality(code_content, file_type)
           'Please analyze this %s code:\n\n```%s\n%s\n```',
           file_type,
           file_type,
-          code_content
+          sanitized
         ),
       },
     },
@@ -177,9 +299,25 @@ end
 --- @return table? optimized_code
 --- @return string? error
 function M.optimize_code(code_content, optimization_type)
+  if not M.config.enabled then
+    return nil, 'AI integration is disabled'
+  end
+
   local available, err = M.check_health()
   if not available then
     return nil, 'NexaMind API unavailable: ' .. (err or 'unknown error')
+  end
+
+  -- Check rate limit
+  local allowed, rate_err = check_rate_limit()
+  if not allowed then
+    return nil, rate_err
+  end
+
+  -- Sanitize code
+  local sanitized, sanitize_err = sanitize_code(code_content)
+  if not sanitized then
+    return nil, sanitize_err
   end
 
   local request_data = {
@@ -196,7 +334,7 @@ function M.optimize_code(code_content, optimization_type)
         content = string.format(
           'Please optimize this code for %s:\n\n%s',
           optimization_type,
-          code_content
+          sanitized
         ),
       },
     },
