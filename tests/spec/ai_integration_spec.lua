@@ -259,6 +259,10 @@ describe('AI Integration', function()
 
   describe('error handling', function()
     it('should handle API unavailability gracefully', function()
+      -- Ensure AI integration is enabled
+      local original_enabled = ai_integration.config.enabled
+      ai_integration.config.enabled = true
+
       -- Mock API as unavailable
       local original_check = ai_integration.check_health
       ai_integration.check_health = function()
@@ -270,8 +274,9 @@ describe('AI Integration', function()
       assert.is_string(error)
       assert.matches("API unavailable", error)
 
-      -- Restore original function
+      -- Restore original functions
       ai_integration.check_health = original_check
+      ai_integration.config.enabled = original_enabled
     end)
 
     it('should handle JSON parsing errors', function()
