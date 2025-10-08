@@ -94,27 +94,25 @@ function M.analyze_current_buffer()
 
   vim.notify('Analyzing code with AI...', vim.log.levels.INFO)
 
-  ai_integration.analyze_code_quality(content, file_type):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI Analysis failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        -- Create a new buffer with the analysis
-        local analysis_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(analysis_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(analysis_buf, 'AI Code Analysis')
+  ai_integration.analyze_code_quality_async(content, file_type, function(result, error)
+    if error then
+      vim.notify('AI Analysis failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      -- Create a new buffer with the analysis
+      local analysis_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(analysis_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(analysis_buf, 'AI Code Analysis')
 
-        local analysis_lines = vim.split(result.text, '\n')
-        vim.api.nvim_buf_set_lines(analysis_buf, 0, -1, false, analysis_lines)
+      local analysis_lines = vim.split(result.text, '\n')
+      vim.api.nvim_buf_set_lines(analysis_buf, 0, -1, false, analysis_lines)
 
-        -- Open in a split window
-        vim.cmd('vsplit')
-        vim.api.nvim_win_set_buf(0, analysis_buf)
-        vim.notify('AI analysis complete', vim.log.levels.INFO)
-      else
-        vim.notify('No analysis results received', vim.log.levels.WARN)
-      end
-    end)
+      -- Open in a split window
+      vim.cmd('vsplit')
+      vim.api.nvim_win_set_buf(0, analysis_buf)
+      vim.notify('AI analysis complete', vim.log.levels.INFO)
+    else
+      vim.notify('No analysis results received', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -135,26 +133,24 @@ function M.optimize_current_buffer(optimization_type)
     vim.log.levels.INFO
   )
 
-  ai_integration.optimize_code(content, optimization_type):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI Optimization failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        -- Show optimization suggestions in a new buffer
-        local opt_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(opt_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(opt_buf, 'AI Code Optimization')
+  ai_integration.optimize_code_async(content, optimization_type, function(result, error)
+    if error then
+      vim.notify('AI Optimization failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      -- Show optimization suggestions in a new buffer
+      local opt_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(opt_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(opt_buf, 'AI Code Optimization')
 
-        local opt_lines = vim.split(result.text, '\n')
-        vim.api.nvim_buf_set_lines(opt_buf, 0, -1, false, opt_lines)
+      local opt_lines = vim.split(result.text, '\n')
+      vim.api.nvim_buf_set_lines(opt_buf, 0, -1, false, opt_lines)
 
-        vim.cmd('split')
-        vim.api.nvim_win_set_buf(0, opt_buf)
-        vim.notify('AI optimization complete', vim.log.levels.INFO)
-      else
-        vim.notify('No optimization results received', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('split')
+      vim.api.nvim_win_set_buf(0, opt_buf)
+      vim.notify('AI optimization complete', vim.log.levels.INFO)
+    else
+      vim.notify('No optimization results received', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -186,25 +182,23 @@ function M.generate_tests_for_buffer(framework)
 
   vim.notify(string.format('Generating %s tests with AI...', framework), vim.log.levels.INFO)
 
-  ai_integration.generate_tests(content, framework):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI Test generation failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        local test_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(test_buf, 'filetype', file_type)
-        vim.api.nvim_buf_set_name(test_buf, 'AI Generated Tests')
+  ai_integration.generate_tests_async(content, framework, function(result, error)
+    if error then
+      vim.notify('AI Test generation failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      local test_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(test_buf, 'filetype', file_type)
+      vim.api.nvim_buf_set_name(test_buf, 'AI Generated Tests')
 
-        local test_lines = vim.split(result.text, '\n')
-        vim.api.nvim_buf_set_lines(test_buf, 0, -1, false, test_lines)
+      local test_lines = vim.split(result.text, '\n')
+      vim.api.nvim_buf_set_lines(test_buf, 0, -1, false, test_lines)
 
-        vim.cmd('tabnew')
-        vim.api.nvim_win_set_buf(0, test_buf)
-        vim.notify('AI test generation complete', vim.log.levels.INFO)
-      else
-        vim.notify('No test generation results received', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('tabnew')
+      vim.api.nvim_win_set_buf(0, test_buf)
+      vim.notify('AI test generation complete', vim.log.levels.INFO)
+    else
+      vim.notify('No test generation results received', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -220,25 +214,23 @@ function M.get_development_suggestions()
 
   vim.notify('Getting AI development suggestions...', vim.log.levels.INFO)
 
-  ai_integration.get_development_suggestions(context):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI suggestions failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        local suggestions_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(suggestions_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(suggestions_buf, 'AI Development Suggestions')
+  ai_integration.get_development_suggestions_async(context, function(result, error)
+    if error then
+      vim.notify('AI suggestions failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      local suggestions_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(suggestions_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(suggestions_buf, 'AI Development Suggestions')
 
-        local suggestion_lines = vim.split(result.text, '\n')
-        vim.api.nvim_buf_set_lines(suggestions_buf, 0, -1, false, suggestion_lines)
+      local suggestion_lines = vim.split(result.text, '\n')
+      vim.api.nvim_buf_set_lines(suggestions_buf, 0, -1, false, suggestion_lines)
 
-        vim.cmd('split')
-        vim.api.nvim_win_set_buf(0, suggestions_buf)
-        vim.notify('AI suggestions ready', vim.log.levels.INFO)
-      else
-        vim.notify('No suggestions received', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('split')
+      vim.api.nvim_win_set_buf(0, suggestions_buf)
+      vim.notify('AI suggestions ready', vim.log.levels.INFO)
+    else
+      vim.notify('No suggestions received', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -250,14 +242,12 @@ function M.check_agent_health()
     vim.notify('✅ NexaMind Agent System: Healthy', vim.log.levels.INFO)
 
     -- Get additional metrics
-    ai_integration.get_api_metrics():next(function(metrics, err)
-      vim.schedule(function()
-        if metrics then
-          local status_msg =
-            string.format('✅ Agents: Active | Endpoints: Available | Status: Operational')
-          vim.notify(status_msg, vim.log.levels.INFO)
-        end
-      end)
+    ai_integration.get_api_metrics_async(function(metrics, err)
+      if metrics then
+        local status_msg =
+          string.format('✅ Agents: Active | Endpoints: Available | Status: Operational')
+        vim.notify(status_msg, vim.log.levels.INFO)
+      end
     end)
   else
     vim.notify('❌ NexaMind Agent System: ' .. (error or 'Unreachable'), vim.log.levels.ERROR)
@@ -268,26 +258,24 @@ end
 function M.show_ai_metrics()
   vim.notify('Fetching AI system metrics...', vim.log.levels.INFO)
 
-  ai_integration.get_api_metrics():next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('Failed to fetch metrics: ' .. error, vim.log.levels.ERROR)
-      elseif result then
-        local metrics_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(metrics_buf, 'filetype', 'json')
-        vim.api.nvim_buf_set_name(metrics_buf, 'NexaMind AI Metrics')
+  ai_integration.get_api_metrics_async(function(result, error)
+    if error then
+      vim.notify('Failed to fetch metrics: ' .. error, vim.log.levels.ERROR)
+    elseif result then
+      local metrics_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(metrics_buf, 'filetype', 'json')
+      vim.api.nvim_buf_set_name(metrics_buf, 'NexaMind AI Metrics')
 
-        local json_str = vim.json.encode(result)
-        local metrics_lines = vim.split(json_str, '\n')
-        vim.api.nvim_buf_set_lines(metrics_buf, 0, -1, false, metrics_lines)
+      local json_str = vim.json.encode(result)
+      local metrics_lines = vim.split(json_str, '\n')
+      vim.api.nvim_buf_set_lines(metrics_buf, 0, -1, false, metrics_lines)
 
-        vim.cmd('vsplit')
-        vim.api.nvim_win_set_buf(0, metrics_buf)
-        vim.notify('AI metrics loaded', vim.log.levels.INFO)
-      else
-        vim.notify('No metrics data received', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('vsplit')
+      vim.api.nvim_win_set_buf(0, metrics_buf)
+      vim.notify('AI metrics loaded', vim.log.levels.INFO)
+    else
+      vim.notify('No metrics data received', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -309,36 +297,34 @@ function M.interactive_chat(message)
     },
   }
 
-  ai_integration.api_request('/ai/chat', request_data):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI Chat failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        local chat_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(chat_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(chat_buf, 'AI Chat Response')
+  ai_integration.api_request_async('/ai/chat', request_data, function(result, error)
+    if error then
+      vim.notify('AI Chat failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      local chat_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(chat_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(chat_buf, 'AI Chat Response')
 
-        local response_lines = {
-          '# AI Chat Response',
-          '',
-          '**Your question:** ' .. message,
-          '',
-          '**AI Response:**',
-          '',
-        }
+      local response_lines = {
+        '# AI Chat Response',
+        '',
+        '**Your question:** ' .. message,
+        '',
+        '**AI Response:**',
+        '',
+      }
 
-        local ai_lines = vim.split(result.text, '\n')
-        vim.list_extend(response_lines, ai_lines)
+      local ai_lines = vim.split(result.text, '\n')
+      vim.list_extend(response_lines, ai_lines)
 
-        vim.api.nvim_buf_set_lines(chat_buf, 0, -1, false, response_lines)
+      vim.api.nvim_buf_set_lines(chat_buf, 0, -1, false, response_lines)
 
-        vim.cmd('split')
-        vim.api.nvim_win_set_buf(0, chat_buf)
-        vim.notify('AI response ready', vim.log.levels.INFO)
-      else
-        vim.notify('No response received from AI', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('split')
+      vim.api.nvim_win_set_buf(0, chat_buf)
+      vim.notify('AI response ready', vim.log.levels.INFO)
+    else
+      vim.notify('No response received from AI', vim.log.levels.WARN)
+    end
   end)
 end
 
@@ -376,38 +362,36 @@ function M.ai_code_review()
     },
   }
 
-  ai_integration.api_request('/ai/chat', request_data):next(function(result, error)
-    vim.schedule(function()
-      if error then
-        vim.notify('AI Code review failed: ' .. error, vim.log.levels.ERROR)
-      elseif result and result.text then
-        local review_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(review_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(review_buf, 'AI Code Review')
+  ai_integration.api_request_async('/ai/chat', request_data, function(result, error)
+    if error then
+      vim.notify('AI Code review failed: ' .. error, vim.log.levels.ERROR)
+    elseif result and result.text then
+      local review_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(review_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(review_buf, 'AI Code Review')
 
-        local review_lines = {
-          '# AI Code Review Report',
-          '',
-          '**File:** ' .. filename,
-          '**Language:** ' .. file_type,
-          '**Generated:** ' .. os.date('%Y-%m-%d %H:%M:%S'),
-          '',
-          '---',
-          '',
-        }
+      local review_lines = {
+        '# AI Code Review Report',
+        '',
+        '**File:** ' .. filename,
+        '**Language:** ' .. file_type,
+        '**Generated:** ' .. os.date('%Y-%m-%d %H:%M:%S'),
+        '',
+        '---',
+        '',
+      }
 
-        local ai_lines = vim.split(result.text, '\n')
-        vim.list_extend(review_lines, ai_lines)
+      local ai_lines = vim.split(result.text, '\n')
+      vim.list_extend(review_lines, ai_lines)
 
-        vim.api.nvim_buf_set_lines(review_buf, 0, -1, false, review_lines)
+      vim.api.nvim_buf_set_lines(review_buf, 0, -1, false, review_lines)
 
-        vim.cmd('tabnew')
-        vim.api.nvim_win_set_buf(0, review_buf)
-        vim.notify('AI code review complete', vim.log.levels.INFO)
-      else
-        vim.notify('No review results received', vim.log.levels.WARN)
-      end
-    end)
+      vim.cmd('tabnew')
+      vim.api.nvim_win_set_buf(0, review_buf)
+      vim.notify('AI code review complete', vim.log.levels.INFO)
+    else
+      vim.notify('No review results received', vim.log.levels.WARN)
+    end
   end)
 end
 

@@ -5,10 +5,48 @@ describe('AI Integration', function()
   before_each(function()
     -- Reset any state
     ai_integration.config = {
+      enabled = true,
       auto_health_check = false,
       health_check_interval = 30000,
       max_retries = 3,
       timeout = 5000,
+      request_timeout = 30000,
+      rate_limit = {
+        max_requests_per_minute = 30,
+        burst_size = 10,
+      },
+      cache = {
+        enabled = true,
+        ttl = 300,
+        max_entries = 100,
+      },
+      queue = {
+        enabled = true,
+        max_size = 50,
+        backoff_base = 1000,
+        backoff_max = 30000,
+      },
+      privacy = {
+        send_file_paths = false,
+        redact_secrets = true,
+        max_code_size = 100000,
+      },
+    }
+
+    -- Initialize cache and rate limit state
+    ai_integration._cache = { entries = {}, access_count = 0 }
+    ai_integration._rate_limit_state = {
+      requests = {},
+      last_cleanup = os.time(),
+      queue = {},
+      processing = false,
+    }
+    ai_integration.stats = {
+      total_calls = 0,
+      cache_hits = 0,
+      cache_misses = 0,
+      queue_enqueued = 0,
+      errors = 0,
     }
   end)
 

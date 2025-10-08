@@ -251,10 +251,8 @@ function M.call_specialized_agent(agent_type, task_type, data, callback)
     },
   }
 
-  ai_integration.api_request('/ai/chat', request_data):next(function(result, error)
-    vim.schedule(function()
-      callback(result, error)
-    end)
+  ai_integration.api_request_async('/ai/chat', request_data, function(result, error)
+    callback(result, error)
   end)
 end
 
@@ -374,7 +372,7 @@ function M.get_ai_completion_suggestions(context, callback)
     },
   }
 
-  ai_integration.api_request('/ai/chat', request_data):next(function(result, error)
+  ai_integration.api_request_async('/ai/chat', request_data, function(result, error)
     if result and result.text then
       local suggestions = vim.split(result.text, '\n')
       local completion_items = {}
@@ -495,45 +493,46 @@ function M.get_project_insights()
     },
   }
 
-  ai_integration.api_request('/ai/chat', request_data):next(function(result, error)
-    vim.schedule(function()
-      if result and result.text then
-        local insights_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(insights_buf, 'filetype', 'markdown')
-        vim.api.nvim_buf_set_name(insights_buf, 'Project Intelligence Insights')
+  ai_integration.api_request_async('/ai/chat', request_data, function(result, error)
+    if result and result.text then
+      local insights_buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(insights_buf, 'filetype', 'markdown')
+      vim.api.nvim_buf_set_name(insights_buf, 'Project Intelligence Insights')
 
-        local insight_lines = {
-          '# 🧠 Project Intelligence Report',
-          '',
-          '**Project:** ' .. cwd,
-          '**Analysis Date:** ' .. os.date('%Y-%m-%d %H:%M:%S'),
-          '',
-          '## Context',
-          '- **Files:** ' .. file_count,
-          '- **Languages:** ' .. table.concat(context.languages, ', '),
-          '',
-          '## AI Insights',
-          '',
-        }
+      local insight_lines = {
+        '# 🧠 Project Intelligence Report',
+        '',
+        '**Project:** ' .. cwd,
+        '**Analysis Date:** ' .. os.date('%Y-%m-%d %H:%M:%S'),
+        '',
+        '## Context',
+        '- **Files:** ' .. file_count,
+        '- **Languages:** ' .. table.concat(context.languages, ', '),
+        '',
+        '## AI Insights',
+        '',
+      }
 
-        local ai_lines = vim.split(result.text, '\n')
-        vim.list_extend(insight_lines, ai_lines)
+      local ai_lines = vim.split(result.text, '\n')
+      vim.list_extend(insight_lines, ai_lines)
 
-        vim.api.nvim_buf_set_lines(insights_buf, 0, -1, false, insight_lines)
+      vim.api.nvim_buf_set_lines(insights_buf, 0, -1, false, insight_lines)
 
-        vim.cmd('tabnew')
-        vim.api.nvim_win_set_buf(0, insights_buf)
-        vim.notify('🧠 Project intelligence analysis complete', vim.log.levels.INFO)
-      end
-    end)
+      vim.cmd('tabnew')
+      vim.api.nvim_win_set_buf(0, insights_buf)
+      vim.notify('🧠 Project intelligence analysis complete', vim.log.levels.INFO)
+    end
   end)
 end
 
---- Detect project languages
+--- Detect project languages (optimized with depth limit)
 --- @return table languages
 function M.detect_project_languages()
   local extensions = {}
-  local files = vim.fn.globpath(vim.fn.getcwd(), '**/*', false, true)
+  -- Limit depth to avoid performance issues in large repos
+  local files = vim.fn.globpath(vim.fn.getcwd(), '*', false, true)
+  vim.list_extend(files, vim.fn.globpath(vim.fn.getcwd(), '*/*', false, true))
+  vim.list_extend(files, vim.fn.globpath(vim.fn.getcwd(), '*/*/*', false, true))
 
   for _, file in ipairs(files) do
     local ext = file:match('%.([^%.]+)$')
@@ -569,23 +568,41 @@ function M.detect_project_languages()
   return languages
 end
 
---- Get git information
+--- Get git information (secure with vim.system)
 --- @return table git_info
 function M.get_git_info()
   local git_info = {}
 
-  -- Get current branch
-  local branch_handle = io.popen('git branch --show-current 2>/dev/null')
-  if branch_handle then
-    git_info.branch = branch_handle:read('*l') or 'unknown'
-    branch_handle:close()
-  end
+  -- Use vim.system if available (Neovim 0.10+), otherwise fallback
+  if vim.system then
+    -- Get current branch
+    local branch_obj = vim.system({ 'git', 'branch', '--show-current' }, { text = true }):wait()
+    if branch_obj.code == 0 and branch_obj.stdout then
+      git_info.branch = branch_obj.stdout:gsub('[\n\r%s]*$', '') or 'unknown'
+    else
+      git_info.branch = 'unknown'
+    end
 
-  -- Get commit count
-  local commit_handle = io.popen('git rev-list --count HEAD 2>/dev/null')
-  if commit_handle then
-    git_info.commits = commit_handle:read('*l') or '0'
-    commit_handle:close()
+    -- Get commit count
+    local commit_obj = vim.system({ 'git', 'rev-list', '--count', 'HEAD' }, { text = true }):wait()
+    if commit_obj.code == 0 and commit_obj.stdout then
+      git_info.commits = commit_obj.stdout:gsub('[\n\r%s]*$', '') or '0'
+    else
+      git_info.commits = '0'
+    end
+  else
+    -- Fallback for older Neovim versions
+    local branch_handle = io.popen('git branch --show-current 2>/dev/null')
+    if branch_handle then
+      git_info.branch = branch_handle:read('*l') or 'unknown'
+      branch_handle:close()
+    end
+
+    local commit_handle = io.popen('git rev-list --count HEAD 2>/dev/null')
+    if commit_handle then
+      git_info.commits = commit_handle:read('*l') or '0'
+      commit_handle:close()
+    end
   end
 
   return git_info
