@@ -1,0 +1,338 @@
+Claude Code v2.0.0 - Complete Voiceover Script
+===============================================
+
+Total Duration: 3:40
+Speaking Rate: 150 words per minute
+Tone: Professional, enthusiastic, clear
+Style: Direct, informative, benefits-focused
+
+PRONUNCIATION GUIDE:
+- Neovim: "NEE-oh-vim"
+- Claude: "CLOD"
+- Polyrepo: "POLY-repo"
+- Asynchronous: "ay-SIN-kron-us"
+
+===============================================
+
+[0:00 - 0:10] SCENE 1: OPENING TITLE
+
+"Introducing Claude Code for Neovim version two-point-oh -
+bringing AI-powered development directly into your editor
+with enterprise-grade security and multi-repository support."
+
+[PAUSE: 2 seconds for stats display]
+
+===============================================
+
+[0:10 - 0:30] SCENE 2: INSTALLATION
+
+"Installation is simple. Just add the plugin to your Lazy-dot-nvim
+configuration, and you're ready to go. It works with Packer,
+vim-plug, or manual installation too.
+
+The setup function lets you customize window position, enable
+multi-instance mode, and configure optional AI features. Sensible
+defaults mean it works great out of the box."
+
+===============================================
+
+[0:30 - 0:50] SCENE 3: BASIC USAGE
+
+"Using Claude Code is effortless. Just press your configured
+keybinding or run the ClaudeCode command, and an integrated
+terminal appears with Claude ready to help.
+
+Ask questions, get code reviews, or request refactoring suggestions.
+Claude has full context of your project and can provide specific,
+actionable advice. The terminal stays embedded in Neovim, so you
+never leave your workflow."
+
+===============================================
+
+[0:50 - 1:20] SCENE 4: MULTI-INSTANCE MANAGEMENT
+
+"Working with multiple repositories? No problem. Claude Code
+intelligently manages separate instances for each git repository.
+
+Switch between projects and your conversation history stays isolated -
+perfect for microservices and polyrepo workflows. The instance switcher
+provides an interactive picker to jump between your active sessions.
+
+Each instance maintains its own context, so you can work on authentication,
+payments, and user services simultaneously without any cross-contamination."
+
+===============================================
+
+[1:20 - 1:50] SCENE 5: AI CODE ANALYSIS
+
+"The optional AI integration provides powerful code analysis.
+Run ClaudeCodeAnalyze on any file to get instant feedback on
+code quality, complexity, and potential issues.
+
+It identifies problems like poor naming, magic numbers, and
+unnecessary complexity - then suggests modern patterns and
+best practices. You get specific recommendations, not just
+vague advice.
+
+The analysis covers readability, performance, security, and
+maintainability - everything you'd want in a thorough code review."
+
+===============================================
+
+[1:50 - 2:15] SCENE 6: PERFORMANCE OPTIMIZATION
+
+"Need to optimize slow code? The AI can suggest performance
+improvements like memoization, virtual scrolling, and callback
+optimization.
+
+It analyzes your React components and provides specific, actionable
+recommendations. You'll see exactly which functions need memoization,
+where to add use-memo hooks, and how to implement virtual lists for
+large datasets.
+
+In this example, we transformed a component re-rendering on every
+prop change into an optimized version that's ten times faster."
+
+===============================================
+
+[2:15 - 2:35] SCENE 7: TEST GENERATION
+
+"Automated test generation saves hours of work. The AI analyzes
+your functions and creates comprehensive test suites with edge
+cases.
+
+It generates tests for Jest, Vitest, pytest, go-test, and more
+frameworks. Each test suite includes happy paths, error cases,
+and boundary conditions.
+
+The generated tests are production-ready with proper assertions,
+descriptive names, and full coverage. You can run them immediately
+or customize them for your specific needs."
+
+===============================================
+
+[2:35 - 2:55] SCENE 8: SECURITY FEATURES
+
+"Security is built-in, not bolted on. Seven enterprise-grade
+features protect your code automatically.
+
+Secrets are automatically redacted before sending to AI. API keys,
+passwords, and tokens are detected and masked using five different
+pattern types.
+
+Rate limiting prevents abuse with configurable thresholds. Code
+size validation stops accidental data dumps. And all processing
+is local by default - no external API calls unless you explicitly
+configure them.
+
+There's zero telemetry, zero data collection, and complete privacy.
+Your code stays yours."
+
+===============================================
+
+[2:55 - 3:15] SCENE 9: TEAM PROFILES
+
+"Team profiles optimize the experience for different roles.
+Backend developers get API and database shortcuts. Frontend
+developers get component and accessibility tools. DevOps engineers
+get infrastructure commands.
+
+Each profile includes custom window positioning, role-specific
+command variants, and optimized keybindings. Migration tools
+make setup instant - just run the migration script and restart
+Neovim.
+
+The validator checks for keymap conflicts with common plugins
+like LSP and Telescope, so your entire team can adopt consistent
+configurations without breaking existing workflows."
+
+===============================================
+
+[3:15 - 3:30] SCENE 10: DOCUMENTATION
+
+"Eight comprehensive guides totaling over four thousand lines
+provide everything you need.
+
+From quick start to advanced workflows, security best practices
+to troubleshooting, the documentation has you covered. Each guide
+includes code examples, configuration templates, and step-by-step
+instructions.
+
+The AI deployment guide covers Docker and Kubernetes. The workflows
+guide shows ten practical development patterns. The security guide
+includes a threat model and compliance matrix. Everything is
+documented, tested, and production-ready."
+
+===============================================
+
+[3:30 - 3:50] SCENE 11: CLOSING MONTAGE
+
+"Claude Code version two-point-oh brings AI-powered development
+to Neovim with enterprise security, multi-repository support,
+and comprehensive documentation.
+
+[PAUSE: 1 second for feature montage]
+
+Install it today and experience the future of coding. Visit the
+GitHub repository to get started, check out the documentation,
+and join our community.
+
+[PAUSE: 2 seconds]
+
+Happy coding!"
+
+===============================================
+
+ALTERNATIVE TAKES / AD-LIBS
+===========================
+
+Opening Alternative:
+"Transform your Neovim workflow with Claude Code two-point-oh.
+AI-powered development meets enterprise-grade security."
+
+Installation Alternative:
+"Getting started takes less than sixty seconds. Add the plugin,
+configure your preferences, and you're coding smarter immediately."
+
+Multi-Instance Alternative:
+"Managing multiple projects is seamless. Each repository gets its
+own isolated Claude instance with preserved context and history."
+
+AI Analysis Alternative:
+"Get instant code reviews that rival senior developer feedback.
+Every suggestion is specific, actionable, and backed by best practices."
+
+Optimization Alternative:
+"Transform slow components into performant ones with AI guidance.
+Real-world performance gains of five to ten times are common."
+
+Security Alternative:
+"Your code's security is our priority. Seven layers of protection
+run automatically, requiring zero configuration."
+
+Closing Alternative:
+"Join thousands of developers already using Claude Code. Install
+today and see why it's the most trusted AI assistant for Neovim."
+
+===============================================
+
+TIMING NOTES
+============
+
+- Each scene should flow naturally into the next
+- Allow 0.5-1 second pauses between major points
+- Speak clearly and maintain consistent pace
+- Emphasize key phrases slightly (AI-powered, enterprise-grade, etc.)
+- End sentences with slight downward inflection for professionalism
+- Build enthusiasm gradually toward the closing
+
+===============================================
+
+RECORDING TIPS
+==============
+
+1. Record in a quiet room with minimal echo
+2. Use a quality microphone (USB condenser recommended)
+3. Position mic 6-8 inches from mouth
+4. Maintain consistent volume throughout
+5. Record 5 seconds of silence for noise reduction
+6. Do 2-3 takes of each section for best quality
+7. Speak with natural enthusiasm, not forced excitement
+8. Imagine you're explaining to a colleague, not presenting
+
+===============================================
+
+POST-PRODUCTION AUDIO
+=====================
+
+Audacity Processing Chain:
+1. Noise Reduction (use silence sample)
+2. Normalize to -3.0 dB
+3. Compressor (Threshold: -20dB, Ratio: 3:1)
+4. EQ (slight high-pass at 80Hz, presence boost at 5kHz)
+5. Limiter (-1.0 dB max)
+6. Export as WAV 44.1kHz 16-bit
+
+===============================================
+
+MUSIC MIXING LEVELS
+===================
+
+Intro (0:00-0:10):
+  Music: 60% volume
+  Voiceover: 100%
+
+Main Content (0:10-3:15):
+  Music: 20-25% volume (background)
+  Voiceover: 100%
+
+Montage (3:15-3:30):
+  Music: 40-50% volume (feature clips)
+  Voiceover: 100%
+
+Outro/End Card (3:30-4:00):
+  Music: 60-70% volume
+  Voiceover: 100% fading to 0%
+  Music: Fade out completely by 3:55
+
+===============================================
+
+BACKUP SECTIONS (If Time Allows)
+=================================
+
+Extended Security Section (30 seconds):
+"Let's dive deeper into security. The threat model covers five
+attack vectors: network interception, data exfiltration, API key
+theft, code injection, and unauthorized access. Every feature is
+designed with security first, privacy always."
+
+Extended Team Section (20 seconds):
+"Team onboarding takes just five minutes. Documentation includes
+validation tools, migration scripts, and workspace templates.
+Everyone gets consistent configurations tailored to their role."
+
+Extended Documentation (20 seconds):
+"The troubleshooting guide alone saves hours. Common issues,
+error solutions, debug tips, and FAQ - all tested with real-world
+scenarios from the community."
+
+===============================================
+
+Word Counts Per Section:
+========================
+Scene 1: 35 words (0:10)
+Scene 2: 65 words (0:20)
+Scene 3: 70 words (0:20)
+Scene 4: 105 words (0:30)
+Scene 5: 95 words (0:30)
+Scene 6: 85 words (0:25)
+Scene 7: 75 words (0:20)
+Scene 8: 75 words (0:20)
+Scene 9: 95 words (0:20)
+Scene 10: 60 words (0:15)
+Scene 11: 55 words (0:20)
+
+Total: ~815 words
+Speaking Rate: 150 WPM
+Duration: 5.4 minutes spoken
+Actual Runtime: 3:40 (with pauses and visual time)
+
+===============================================
+
+FINAL CHECKLIST BEFORE RECORDING
+=================================
+
+[  ] Microphone tested and positioned correctly
+[  ] Room is quiet (no fans, AC, traffic noise)
+[  ] Glass of water nearby for hydration
+[  ] Script printed or displayed clearly
+[  ] Recording software configured (44.1kHz, 16-bit)
+[  ] Backup recording device running (phone app)
+[  ] Timer visible for pacing check
+[  ] Practice read-through completed
+[  ] Voice warmed up (humming, scales)
+[  ] Ready to record multiple takes
+
+===============================================
+
+That's your complete voiceover script! Good luck with the recording!
